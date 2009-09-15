@@ -46,8 +46,15 @@ def paste(ui, repo, *fnames, **opts):
     
     ui.pushbuffer()
     if opts['rev']:
-        revs = cmdutil.revrange(repo, [opts.pop('rev')])
-        patch.export(repo, revs, fp=ui, opts=patch.diffopts(ui, opts))
+        rev = opts.pop('rev')
+        revs = cmdutil.revrange(repo, rev)
+        
+        if len(revs) == 1:
+            opts['change'] = revs[0]
+        else:
+            opts['rev'] = rev
+        
+        commands.diff(ui, repo, *fnames, **opts)
     else:
         commands.diff(ui, repo, *fnames, **opts)
     content = ui.popbuffer()
@@ -63,16 +70,16 @@ def paste(ui, repo, *fnames, **opts):
 cmdtable = {
     'paste': 
     (paste, [
-        ('r', 'rev',   '', 'paste a patch of the given revision(s)'),
+        ('r', 'rev',   [], 'paste a patch of the given revision(s)'),
         ('d', 'dest',  '', 'the pastebin site to use (defaults to dpaste)'),
         ('t', 'title', '', 'the title of the paste (optional)'),
         ('u', 'user',  '', 'the name of the paste\'s author (defaults to the '
                            'username configured for Mercurial)'),
-        ('k', 'keep', False, 'specify that the pastebin should keep the paste for as '
-                             'long as possible (optional, not universally supported)'),
+        ('k', 'keep', False, 'specify that the pastebin should keep the paste '
+                             'for as long as possible (optional)'),
         ('',  'dry-run', False, 'do not paste to the pastebin'),
     ] + commands.diffopts + commands.walkopts,
-    'hg paste [OPTION] [-r REV | FILE...]')
+    'hg paste [OPTION] [-r REV] [FILE...]')
 }
 
 help.helptable += (
