@@ -14,6 +14,8 @@ def _paste_dpaste(content, **parameters):
         data.append(('title', parameters['title']),)
     if parameters['user']:
         data.append(('poster', parameters['user']),)
+    if parameters['keep']:
+        data.append(('hold', 'on'),)
     data = urlencode(data)
     
     request = urllib2.Request(pastebins['dpaste']['url'], data)
@@ -26,7 +28,7 @@ pastebins = {
     'dpaste': { 'url': 'http://dpaste.com/api/v1/',
                 'parameters': {
                     'required': ['content'],
-                    'optional': ['title', 'user'], },
+                    'optional': ['title', 'user', 'keep'], },
                 'handler': _paste_dpaste,
     }
 }
@@ -49,6 +51,8 @@ cmdtable = {
         ('t', 'title', '', 'the title of the paste (optional)'),
         ('u', 'user', '', 'the name of the paste\'s author (defaults to the '
                           'username configured for Mercurial)'),
+        ('k', 'keep', '', 'specify that the pastebin should keep the paste for as '
+                          'long as possible (optional, not universally supported)'),
     ],
     'hg paste -d PASTEBIN')
 }
