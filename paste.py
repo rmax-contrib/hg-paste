@@ -28,7 +28,7 @@ pastebins = {
     'dpaste': { 'url': 'http://dpaste.com/api/v1/',
                 'parameters': {
                     'required': ['content'],
-                    'optional': ['title', 'user', 'keep', 'syntax'], },
+                    'optional': ['title', 'user', 'keep'], },
                 'handler': _paste_dpaste,
     }
 }
