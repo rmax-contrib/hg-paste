@@ -68,8 +68,7 @@ def paste(ui, repo, *fnames, **opts):
 
 
 cmdtable = {
-    'paste': 
-    (paste, [
+    'paste': (paste, [
         ('r', 'rev',   [], 'paste a patch of the given revision(s)'),
         ('d', 'dest',  '', 'the pastebin site to use (defaults to dpaste)'),
         ('t', 'title', '', 'the title of the paste (optional)'),
