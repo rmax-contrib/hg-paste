@@ -1,15 +1,25 @@
 #!/usr/bin/env python
 
-'''send information from Mercurial to various pastebin websites'''
+'''send information from Mercurial to various pastebin websites
+'''
 
-def paste(ui, repo, destination=None, **opts):
+from mercurial import util
+
+pastebins = {
+    'dpaste': 'http://dpaste.com/api/v1/'
+}
+
+def paste(ui, repo, destination, **opts):
+    if destination not in pastebins:
+        raise util.Abort('Unknown pastebin.  See "hg help paste" for supported pastebins.')
+        return
     pass
 
 
 cmdtable = {
     "paste": 
     (paste, [
-        ('d', 'destination', None, 'the pastebin site to use'),
+        ('d', 'destination', '', 'the pastebin site to use'),
     ],
-    'hg paste --destination PASTEBIN')
+    'hg paste -d PASTEBIN')
 }
