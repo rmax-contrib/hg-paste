@@ -35,6 +35,7 @@ pastebins = {
 
 def paste(ui, repo, *fnames, **opts):
     dest = opts.pop('dest')
+    dry = opts.pop('dry_run')
     if not dest:
         dest = 'dpaste'
     if dest not in pastebins:
@@ -54,8 +55,9 @@ def paste(ui, repo, *fnames, **opts):
     if ui.verbose:
         ui.status('Pasting:\n%s\n' % content)
     
-    url = pastebins[dest]['handler'](content=content, **opts)
-    ui.write('%s\n' % url)
+    if not dry:
+        url = pastebins[dest]['handler'](content=content, **opts)
+        ui.write('%s\n' % url)
 
 
 cmdtable = {
@@ -68,8 +70,9 @@ cmdtable = {
                            'username configured for Mercurial)'),
         ('k', 'keep', False, 'specify that the pastebin should keep the paste for as '
                              'long as possible (optional, not universally supported)'),
-    ] + commands.diffopts,
-    'hg paste -d PASTEBIN FILE...')
+        ('',  'dry-run', False, 'do not paste to the pastebin'),
+    ] + commands.diffopts + commands.walkopts,
+    'hg paste [OPTION] [-r REV | FILE...]')
 }
 
 help.helptable += (
