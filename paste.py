@@ -86,6 +86,9 @@ def paste(ui, repo, *fnames, **opts):
         commands.diff(ui, repo, *fnames, **opts)
     content = ui.popbuffer()
     
+    if not content.strip():
+        raise util.Abort('nothing to paste!')
+    
     if ui.verbose:
         ui.status('Pasting:\n%s\n' % content)
     
