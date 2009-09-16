@@ -54,4 +54,5 @@ If you find any bugs, please create an issue in the [issue tracker][issues].
 
 If you want to contribute (support for more pastebin websites would be great), fork the [repository][] on BitBucket and send a pull request.
 
+[issues]: http://bitbucket.org/sjl/hg-paste/issues/?status=new&status=open
 [repository]: http://bitbucket.org/sjl/hg-paste
