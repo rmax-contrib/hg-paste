@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-'''send information from Mercurial to various pastebin websites
+'''send diffs from Mercurial to various pastebin websites
 '''
 
 import urllib2
@@ -24,6 +24,7 @@ def _paste_dpaste(content, **parameters):
     location = response.geturl()
     return location
 
+
 pastebins = {
     'dpaste': { 'url': 'http://dpaste.com/api/v1/',
                 'parameters': {
@@ -34,6 +35,32 @@ pastebins = {
 }
 
 def paste(ui, repo, *fnames, **opts):
+    '''send diffs from Mercurial to various pastebin websites
+    
+    Send a diff of the specified files to a pastebin website to easily
+    share with other people.  If no files are specified all files will
+    be included.
+    
+    To paste a diff of all uncommitted changes in the working directory:
+    
+        hg paste
+    
+    To paste the changes that revision REV made:
+    
+        hg paste -r REV
+    
+    To paste the changes between revisions REV1 and REV2:
+    
+        hg paste -r REV1:REV2
+    
+    Several options can be used to specify more metadata about the paste:
+    
+        hg paste --user Steve --title 'Progress on feature X' --keep
+    
+    The pastebin website to use can be specified with --dest, but currently
+    only dpaste (http://dpaste.com/) is supported.
+    
+    '''
     dest = opts.pop('dest')
     dry = opts.pop('dry_run')
     if not dest:
@@ -91,6 +118,6 @@ help.helptable += (
     
     dpaste
         website: http://dpaste.com/
-        supported options: --title, --keep, --user
+        supported metadata options: --title, --keep, --user
     ''')),
 )
