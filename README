@@ -44,8 +44,8 @@ Several options can be used to specify more metadata about the paste:
 
     hg paste --user Steve --title 'Progress on feature X' --keep
 
-The pastebin website to use can be specified with `--dest`, but currently
-only [dpaste](http://dpaste.com/) is supported.
+The pastebin website to use can be specified with `--dest`.  Currently
+only [dpaste.com](http://dpaste.com/) and [dpaste.org](http://dpaste.org) are supported.
 
 Questions, Comments, Suggestions
 --------------------------------

@@ -76,8 +76,8 @@ def paste(ui, repo, *fnames, **opts):
     
         hg paste --user Steve --title 'Progress on feature X' --keep
     
-    The pastebin website to use can be specified with --dest, but currently
-    only dpaste (http://dpaste.com/) is supported.
+    The pastebin website to use can be specified with --dest.  See
+    'hg help pastebins' for more information.
     
     '''
     dest = opts.pop('dest')
@@ -133,8 +133,8 @@ cmdtable = {
 help.helptable += (
     (['pastebins', 'pastebins'], ('Pastebins supported by hg-paste'),
      (r'''
-    hg-paste only works with dpaste at the moment.  More pastebins will be
-    supported in the future.
+    hg-paste currently supports dpaste.com and dpaste.org.  More pastebins
+    will be supported in the future.
     
     Available pastebins:
     
