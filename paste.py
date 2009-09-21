@@ -24,6 +24,19 @@ def _paste_dpaste(content, **parameters):
     location = response.geturl()
     return location
 
+def _paste_dpaste_org(content, **parameters):
+    data = {'content': content, 'lexer': 'diff'}
+    if parameters['title']:
+        data['title'] = parameters['title']
+    if parameters['user']:
+        data['author'] = parameters['user']
+    # Same values used in dpaste.org form for default (a month) and forever expires.
+    data['expire_options'] = '3110400000' if parameters['keep'] else '2592000'
+    data = urlencode(data)
+    
+    request = urllib2.Request(pastebins['dpaste.org']['url'], data)
+    response = urllib2.urlopen(request)
+    return response.geturl()
 
 pastebins = {
     'dpaste': { 'url': 'http://dpaste.com/api/v1/',
@@ -31,7 +44,13 @@ pastebins = {
                     'required': ['content'],
                     'optional': ['title', 'user', 'keep'], },
                 'handler': _paste_dpaste,
-    }
+    },
+    'dpaste.org': { 'url': 'http://dpaste.org/',
+                'parameters': {
+                    'required': ['content'],
+                    'optional': ['title', 'user', 'keep'], },
+                'handler': _paste_dpaste_org,
+    },
 }
 
 def paste(ui, repo, *fnames, **opts):
@@ -121,6 +140,10 @@ help.helptable += (
     
     dpaste
         website: http://dpaste.com/
+        supported metadata options: --title, --keep, --user
+
+    dpaste.org
+        website: http://dpaste.org/
         supported metadata options: --title, --keep, --user
     ''')),
 )
