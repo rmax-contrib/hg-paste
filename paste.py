@@ -9,13 +9,13 @@ from urllib import urlencode
 
 
 def _paste_dpaste(content, **parameters):
-    data = [('content', content), ('language', 'Diff')]
+    data = {'content': content, 'language': 'Diff'}
     if parameters['title']:
-        data.append(('title', parameters['title']),)
+        data['title'] = parameters['title']
     if parameters['user']:
-        data.append(('poster', parameters['user']),)
+        data['poster'] = parameters['user']
     if parameters['keep']:
-        data.append(('hold', 'on'),)
+        data['hold'] = 'on'
     data = urlencode(data)
     
     request = urllib2.Request(pastebins['dpaste']['url'], data)
@@ -30,6 +30,7 @@ def _paste_dpaste_org(content, **parameters):
         data['title'] = parameters['title']
     if parameters['user']:
         data['author'] = parameters['user']
+    
     # Same values used in dpaste.org form for default (a month) and forever expires.
     data['expire_options'] = '3110400000' if parameters['keep'] else '2592000'
     data = urlencode(data)
