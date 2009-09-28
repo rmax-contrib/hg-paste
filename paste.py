@@ -4,7 +4,7 @@
 '''
 
 import urllib2
-from mercurial import cmdutil, commands, help, patch, util
+from mercurial import cmdutil, commands, help, util
 from urllib import urlencode
 
 
