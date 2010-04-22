@@ -32,6 +32,11 @@ def _paste_dpaste(content, **parameters):
     if parameters['httpauth']:
         request.add_header('Authorization', 'Basic %s' \
                     % base64.encodestring(parameters['httpauth'])[:-1])
+    elif parameters['usenetrc']:
+        auth = _netrc_get_credentials(url)
+        if auth:
+            request.add_header('Authorization', 'Basic %s' \
+                    % base64.encodestring('%s:%s' % (auth[0], auth[2]))[:-1])
     response = urllib2.urlopen(request)
     return response.geturl()
 
@@ -58,8 +63,19 @@ def _paste_dpaste_org(content, **parameters):
     if parameters['httpauth']:
         request.add_header('Authorization', 'Basic %s' \
                     % base64.encodestring(parameters['httpauth'])[:-1])
+    elif parameters['usenetrc']:
+        auth = _netrc_get_credentials(url)
+        if auth:
+            request.add_header('Authorization', 'Basic %s' \
+                    % base64.encodestring('%s:%s' % (auth[0], auth[2]))[:-1])
     response = urllib2.urlopen(request)
     return response.geturl()
+
+def _netrc_get_credentials(url):
+    import netrc, urlparse
+    credentials = netrc.netrc()
+    host = urlparse.urlparse(url).hostname
+    return credentials.authenticators(host)
 
 pastebins = {
     'dpaste': { 'url': 'http://dpaste.com/api/v1/',
@@ -151,6 +167,7 @@ cmdtable = {
         ('',  'dry-run', False, 'do not paste to the pastebin'),
         ('',  'url', '', 'perform request against this url'),
         ('',  'httpauth', '', 'http authorization (user:pass)'),
+        ('',  'usenetrc', False, 'use ~/.netrc for http authorization'),
     ] + commands.diffopts + commands.walkopts,
     'hg paste [OPTION] [-r REV] [FILE...]')
 }
