@@ -3,6 +3,7 @@
 '''send diffs from Mercurial to various pastebin websites
 '''
 
+import base64
 import urllib2
 from mercurial import cmdutil, commands, help, util
 from urllib import urlencode
@@ -14,15 +15,25 @@ def _paste_dpaste(content, **parameters):
         data['title'] = parameters['title']
     if parameters['user']:
         data['poster'] = parameters['user']
+
+    if len(data['poster']) > 30:
+        data['poster'] = data['poster'][:30]
+
     if parameters['keep']:
         data['hold'] = 'on'
     data = urlencode(data)
     
-    request = urllib2.Request(pastebins['dpaste']['url'], data)
+    if parameters['url']:
+        url = parameters['url']
+    else:
+        url = pastebins['dpaste']['url']
+ 
+    request = urllib2.Request(url, data)
+    if parameters['httpauth']:
+        request.add_header('Authorization', 'Basic %s' \
+                    % base64.encodestring(parameters['httpauth'])[:-1])
     response = urllib2.urlopen(request)
-    
-    location = response.geturl()
-    return location
+    return response.geturl()
 
 def _paste_dpaste_org(content, **parameters):
     data = {'content': content, 'lexer': 'diff'}
@@ -30,12 +41,23 @@ def _paste_dpaste_org(content, **parameters):
         data['title'] = parameters['title']
     if parameters['user']:
         data['author'] = parameters['user']
-    
+
+    if len(data['author']) > 30:
+        data['author'] = data['author'][:30]
+
     # Same values used in dpaste.org form for default (a month) and forever expires.
     data['expire_options'] = '3110400000' if parameters['keep'] else '2592000'
     data = urlencode(data)
+
+    if parameters['url']:
+        url = parameters['url']
+    else:
+        url = pastebins['dpaste.org']['url']
     
-    request = urllib2.Request(pastebins['dpaste.org']['url'], data)
+    request = urllib2.Request(url, data)
+    if parameters['httpauth']:
+        request.add_header('Authorization', 'Basic %s' \
+                    % base64.encodestring(parameters['httpauth'])[:-1])
     response = urllib2.urlopen(request)
     return response.geturl()
 
@@ -127,6 +149,8 @@ cmdtable = {
         ('k', 'keep', False, 'specify that the pastebin should keep the paste '
                              'for as long as possible (optional)'),
         ('',  'dry-run', False, 'do not paste to the pastebin'),
+        ('',  'url', '', 'perform request against this url'),
+        ('',  'httpauth', '', 'http authorization (user:pass)'),
     ] + commands.diffopts + commands.walkopts,
     'hg paste [OPTION] [-r REV] [FILE...]')
 }
