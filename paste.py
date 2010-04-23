@@ -15,10 +15,10 @@ def _paste_dpaste(content, **parameters):
         data['title'] = parameters['title']
     if parameters['user']:
         data['poster'] = parameters['user']
-
+    
     if len(data['poster']) > 30:
         data['poster'] = data['poster'][:30]
-
+    
     if parameters['keep']:
         data['hold'] = 'on'
     data = urlencode(data)
@@ -27,7 +27,7 @@ def _paste_dpaste(content, **parameters):
         url = parameters['url']
     else:
         url = pastebins['dpaste']['url']
- 
+    
     request = urllib2.Request(url, data)
     if parameters['httpauth']:
         request.add_header('Authorization', 'Basic %s' \
@@ -41,14 +41,14 @@ def _paste_dpaste_org(content, **parameters):
         data['title'] = parameters['title']
     if parameters['user']:
         data['author'] = parameters['user']
-
+    
     if len(data['author']) > 30:
         data['author'] = data['author'][:30]
-
+    
     # Same values used in dpaste.org form for default (a month) and forever expires.
     data['expire_options'] = '3110400000' if parameters['keep'] else '2592000'
     data = urlencode(data)
-
+    
     if parameters['url']:
         url = parameters['url']
     else:
