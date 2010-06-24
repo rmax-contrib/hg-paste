@@ -11,7 +11,7 @@ from urllib import urlencode
 
 
 def _paste_dpaste(content, **parameters):
-    data = {'content': content, 'language': 'Diff'}
+    data = {'content': content, 'language': parameters['syntax'] or 'Diff'}
     if parameters['title']:
         data['title'] = parameters['title']
     if parameters['user']:
@@ -42,7 +42,7 @@ def _paste_dpaste(content, **parameters):
     return response.geturl()
 
 def _paste_dpaste_org(content, **parameters):
-    data = {'content': content, 'lexer': 'diff'}
+    data = {'content': content, 'lexer': parameters['syntax'] or 'diff'}
     if parameters['title']:
         data['title'] = parameters['title']
     if parameters['user']:
@@ -176,6 +176,7 @@ cmdtable = {
         ('',  'httpauth', '', 'http authorization (user:pass)'),
         ('',  'usenetrc', False, 'use ~/.netrc for http authorization'),
         ('',  'stdin', False, 'read content from standard input'),
+        ('',  'syntax', '', 'choose syntax'),
     ] + commands.diffopts + commands.walkopts,
     'hg paste [OPTION] [-r REV] [FILE...]')
 }
