@@ -35,8 +35,8 @@ def _paste_dpaste(content, **parameters):
     elif parameters['netrc']:
         auth = _netrc_get_credentials(url)
         if auth:
-            request.add_header('Authorization', 'Basic %s' \
-                    % base64.encodestring('%s:%s' % (auth[0], auth[2]))[:-1])
+            b64str = base64.urlsafe_b64encode('%s:%s' % (auth[0], auth[2]))
+            request.add_header('Authorization', 'Basic %s' % b64str)
     response = urllib2.urlopen(request)
     return response.geturl()
 
