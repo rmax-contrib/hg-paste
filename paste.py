@@ -32,7 +32,7 @@ def _paste_dpaste(content, **parameters):
     if parameters['httpauth']:
         request.add_header('Authorization', 'Basic %s' \
                     % base64.encodestring(parameters['httpauth'])[:-1])
-    elif parameters['usenetrc']:
+    elif parameters['netrc']:
         auth = _netrc_get_credentials(url)
         if auth:
             request.add_header('Authorization', 'Basic %s' \
@@ -63,7 +63,7 @@ def _paste_dpaste_org(content, **parameters):
     if parameters['httpauth']:
         request.add_header('Authorization', 'Basic %s' \
                     % base64.encodestring(parameters['httpauth'])[:-1])
-    elif parameters['usenetrc']:
+    elif parameters['netrc']:
         auth = _netrc_get_credentials(url)
         if auth:
             request.add_header('Authorization', 'Basic %s' \
@@ -167,7 +167,7 @@ cmdtable = {
         ('',  'dry-run', False, 'do not paste to the pastebin'),
         ('',  'url', '', 'perform request against this url'),
         ('',  'httpauth', '', 'http authorization (user:pass)'),
-        ('',  'usenetrc', False, 'use ~/.netrc for http authorization'),
+        ('',  'netrc', False, 'use ~/.netrc for http authorization'),
     ] + commands.diffopts + commands.walkopts,
     'hg paste [OPTION] [-r REV] [FILE...]')
 }
