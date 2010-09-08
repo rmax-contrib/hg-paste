@@ -4,13 +4,14 @@
 '''
 
 import base64
+import sys
 import urllib2
 from mercurial import cmdutil, commands, help, util
 from urllib import urlencode
 
 
 def _paste_dpaste(content, **parameters):
-    data = {'content': content, 'language': 'Diff'}
+    data = {'content': content, 'language': parameters['syntax'] or 'Diff'}
     if parameters['title']:
         data['title'] = parameters['title']
     if parameters['user']:
@@ -22,12 +23,12 @@ def _paste_dpaste(content, **parameters):
     if parameters['keep']:
         data['hold'] = 'on'
     data = urlencode(data)
-    
+
     if parameters['url']:
         url = parameters['url']
     else:
         url = pastebins['dpaste']['url']
- 
+
     request = urllib2.Request(url, data)
     if parameters['httpauth']:
         request.add_header('Authorization', 'Basic %s' \
@@ -41,7 +42,7 @@ def _paste_dpaste(content, **parameters):
     return response.geturl()
 
 def _paste_dpaste_org(content, **parameters):
-    data = {'content': content, 'lexer': 'diff'}
+    data = {'content': content, 'lexer': parameters['syntax'] or 'diff'}
     if parameters['title']:
         data['title'] = parameters['title']
     if parameters['user']:
@@ -58,7 +59,7 @@ def _paste_dpaste_org(content, **parameters):
         url = parameters['url']
     else:
         url = pastebins['dpaste.org']['url']
-    
+
     request = urllib2.Request(url, data)
     if parameters['httpauth']:
         request.add_header('Authorization', 'Basic %s' \
@@ -125,28 +126,34 @@ def paste(ui, repo, *fnames, **opts):
         dest = 'dpaste'
     if dest not in pastebins:
         raise util.Abort('unknown pastebin (see "hg help pastebins")!')
-    
+
     if not opts['user']:
         opts['user'] = ui.username().replace('<', '').replace('>', '')
-    
-    ui.pushbuffer()
-    if opts['rev']:
-        rev = opts.pop('rev')
-        revs = cmdutil.revrange(repo, rev)
-        
-        if len(revs) == 1:
-            opts['change'] = revs[0]
-        else:
-            opts['rev'] = rev
-        
-        commands.diff(ui, repo, *fnames, **opts)
+
+    if opts['rev'] and opts['stdin']:
+        raise util.Abort('--rev and --stdin options are mutually exclusive')
+
+    if opts['stdin']:
+        content = sys.stdin.read()
     else:
-        commands.diff(ui, repo, *fnames, **opts)
-    content = ui.popbuffer()
-    
+        ui.pushbuffer()
+        if opts['rev']:
+            rev = opts.pop('rev')
+            revs = cmdutil.revrange(repo, rev)
+
+            if len(revs) == 1:
+                opts['change'] = revs[0]
+            else:
+                opts['rev'] = rev
+
+            commands.diff(ui, repo, *fnames, **opts)
+        else:
+            commands.diff(ui, repo, *fnames, **opts)
+        content = ui.popbuffer()
+
     if not content.strip():
         raise util.Abort('nothing to paste!')
-    
+
     if ui.verbose:
         ui.status('Pasting:\n%s\n' % content)
     
@@ -168,6 +175,8 @@ cmdtable = {
         ('',  'url', '', 'perform request against this url'),
         ('',  'httpauth', '', 'http authorization (user:pass)'),
         ('',  'netrc', False, 'use ~/.netrc for http authorization'),
+        ('',  'stdin', False, 'read content from standard input'),
+        ('',  'syntax', '', 'choose syntax'),
     ] + commands.diffopts + commands.walkopts,
     'hg paste [OPTION] [-r REV] [FILE...]')
 }
